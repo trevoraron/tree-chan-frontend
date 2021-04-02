@@ -1,24 +1,23 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+// import './App.css';
+import { Jumbotron, Button, Spinner } from 'react-bootstrap'
 
 function App() {
+  const [waiting, setWaiting] = useState(false)
+
+  let element = <Spinner animation="border" role="status"></Spinner>
+  if (!waiting) {
+    element = <Button onClick={async () => {setWaiting(true)}}>
+        Connect Wallet
+      </Button>
+  }
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Jumbotron>
+        <h1>Tree Chan Frontend</h1>
+        {element}
+      </Jumbotron>
     </div>
   );
 }

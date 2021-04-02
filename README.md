@@ -1,4 +1,9 @@
-# Getting Started with Create React App
+# Tree Chan Frontend
+
+Frontend for the Tree Chan platform. See the core contracts here:
+https://github.com/trevoraron/tree-chan-core
+
+## Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
