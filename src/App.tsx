@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 // import './App.css';
 import { Jumbotron, Button, Spinner } from 'react-bootstrap';
-import { ethers, Signer } from 'ethers';
+import { BigNumber, ethers, Signer } from 'ethers';
 import {Container, Card} from 'react-bootstrap'
 
 const contractAddress = "0xFc2540389af95921a8c2D8AeA3A884bf9e38cee8";
@@ -48,7 +48,7 @@ function App() {
     </Button>
   } else {
     element = <p>User Address: {address}</p>
-    post = <PostManager id={4} signer={signer}></PostManager>
+    post = <PostManager id={BigNumber.from(4)} signer={signer}></PostManager>
   }
 
   return (
@@ -65,12 +65,13 @@ function App() {
 }
 
 type PostManagerProps = {
-  id: Number 
+  id: BigNumber 
   signer: Signer
 }
 function PostManager(props: PostManagerProps) {
   const [id, updateMainID] = useState(props.id)
-  const [parents, updateParents] = useState<Number[]>([])
+  const [parents, updateParents] = useState<BigNumber[]>([])
+  const [replies, updateReplies] = useState<BigNumber[]>([])
 
   useEffect(() =>  {
     let contract = new ethers.Contract(
@@ -80,19 +81,27 @@ function PostManager(props: PostManagerProps) {
     )
     const fetchData = async () => {
       let curParents = await contract.getParents(id)
-      console.log(curParents)
+      let curReplies = await contract.getBranches(id)
       updateParents(curParents)
+      updateReplies(curReplies)
     }
     fetchData()
   }, [id, props.signer])
 
-  return <Post id={id} signer={props.signer} updateID={updateMainID}></Post>
+  return <>
+    <h1>Parents</h1>
+    {parents.map(p => <Post id={p} signer={props.signer} updateID={updateMainID}></Post>)}
+    <h1>Post</h1>
+    <Post id={id} signer={props.signer} updateID={updateMainID}></Post>
+    <h1>Replies</h1>
+    {replies.map(p => <Post id={p} signer={props.signer} updateID={updateMainID}></Post>)}
+  </>
 }
 
 type PostProps = {
-  id: Number 
+  id: BigNumber 
   signer: Signer
-  updateID: React.Dispatch<React.SetStateAction<Number>>
+  updateID: React.Dispatch<React.SetStateAction<BigNumber>>
 }
 
 function Post(props: PostProps) {
@@ -129,7 +138,7 @@ function Post(props: PostProps) {
   return (
     <Card>
       <Card.Body>
-        <Card.Title>Post #:{props.id}</Card.Title>
+        <Card.Title>Post #:{props.id.toString()}</Card.Title>
         {messageDisplayed}
         <Button variant="primary">Comment</Button>
         <Button variant="secondary" onClick={() => makePrimary()}>Make Primary</Button>
