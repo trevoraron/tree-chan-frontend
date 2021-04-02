@@ -1,18 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 // import './App.css';
 import { Jumbotron, Button, Spinner } from 'react-bootstrap';
 import { BigNumber, ethers, Signer } from 'ethers';
-import {Container, Card} from 'react-bootstrap'
-
-const contractAddress = "0xFc2540389af95921a8c2D8AeA3A884bf9e38cee8";
-const contractMethods = [
-  "function getMessage(uint256 _token) external view returns (string message)",
-  "function ownerOf(uint256 _tokenId) external view returns (address)",
-  "function getParents(uint256 _token) external view returns (uint256[] memory)",
-  "function getBranches(uint256 _token) external view returns (uint256[] memory)",
-  "function newThread(string memory _message) public returns (uint256)",
-  "function comment(uint256 _post, string memory _message)",
-];
+import {Container} from 'react-bootstrap'
+import { PostManager } from './Post'
 
 declare global {
   interface Window {
@@ -62,89 +53,6 @@ function App() {
       </Container>
     </div>
   );
-}
-
-type PostManagerProps = {
-  id: BigNumber 
-  signer: Signer
-}
-function PostManager(props: PostManagerProps) {
-  const [id, updateMainID] = useState(props.id)
-  const [parents, updateParents] = useState<BigNumber[]>([])
-  const [replies, updateReplies] = useState<BigNumber[]>([])
-
-  useEffect(() =>  {
-    let contract = new ethers.Contract(
-      contractAddress,
-      contractMethods,
-      props.signer
-    )
-    const fetchData = async () => {
-      let curParents = await contract.getParents(id)
-      let curReplies = await contract.getBranches(id)
-      updateParents(curParents)
-      updateReplies(curReplies)
-    }
-    fetchData()
-  }, [id, props.signer])
-
-  return <>
-    <h1>Parents</h1>
-    {parents.map(p => <Post id={p} signer={props.signer} updateID={updateMainID}></Post>)}
-    <h1>Post</h1>
-    <Post id={id} signer={props.signer} updateID={updateMainID}></Post>
-    <h1>Replies</h1>
-    {replies.map(p => <Post id={p} signer={props.signer} updateID={updateMainID}></Post>)}
-  </>
-}
-
-type PostProps = {
-  id: BigNumber 
-  signer: Signer
-  updateID: React.Dispatch<React.SetStateAction<BigNumber>>
-}
-
-function Post(props: PostProps) {
-  const [message, setMessage] = useState("")
-  const [owner, setOwner] = useState("")
-
-  useEffect(() =>  {
-    let contract = new ethers.Contract(
-      contractAddress,
-      contractMethods,
-      props.signer
-    )
-    const fetchData = async () => {
-      let readOwner = await contract.ownerOf(props.id)
-      let readMessage = await contract.getMessage(props.id)
-      setMessage(readMessage)
-      setOwner(readOwner)
-    }
-    fetchData()
-  }, [props.id, props.signer])
-
-  let messageDisplayed = <Spinner animation="border" role="status"></Spinner>
-  if(message !== "") {
-    messageDisplayed = <>
-      <Card.Subtitle>Owner: {owner}</Card.Subtitle>
-      <Card.Text>{message}</Card.Text>
-    </>
-  }
-
-  function makePrimary() {
-    props.updateID(props.id)
-  }
-
-  return (
-    <Card>
-      <Card.Body>
-        <Card.Title>Post #{props.id.toString()}</Card.Title>
-        {messageDisplayed}
-        <Button variant="primary">Comment</Button>
-        <Button variant="secondary" onClick={() => makePrimary()}>Make Primary</Button>
-      </Card.Body>
-    </Card>
-  )
 }
 
 export default App;
