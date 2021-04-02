@@ -138,7 +138,7 @@ function Post(props: PostProps) {
   return (
     <Card>
       <Card.Body>
-        <Card.Title>Post #:{props.id.toString()}</Card.Title>
+        <Card.Title>Post #{props.id.toString()}</Card.Title>
         {messageDisplayed}
         <Button variant="primary">Comment</Button>
         <Button variant="secondary" onClick={() => makePrimary()}>Make Primary</Button>
