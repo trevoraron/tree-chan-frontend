@@ -6,6 +6,9 @@ const ContractMethods = [
   "function getBranches(uint256 _token) external view returns (uint256[] memory)",
   "function newThread(string memory _message) public returns (uint256)",
   "function comment(uint256 _post, string memory _message)",
+  "function totalSupply() external view returns (uint256)",
+  "event Transfer(address indexed _from, address indexed _to, uint256 indexed _tokenId)",
+
 ];
 
 export { ContractAddress, ContractMethods }

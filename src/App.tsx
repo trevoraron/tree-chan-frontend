@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Jumbotron, Button, Spinner } from 'react-bootstrap';
 import { BigNumber, ethers, Signer } from 'ethers';
 import {Container} from 'react-bootstrap'
-import { PostManager } from './Post'
+import { PostManager } from './PostManager'
 
 declare global {
   interface Window {
@@ -39,7 +39,7 @@ function App() {
     </Button>
   } else {
     element = <p>User Address: {address}</p>
-    post = <PostManager id={BigNumber.from(4)} signer={signer}></PostManager>
+    post = <PostManager id={BigNumber.from(1)} signer={signer}></PostManager>
   }
 
   return (

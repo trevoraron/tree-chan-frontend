@@ -1,43 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Spinner } from 'react-bootstrap';
-import { BigNumber, ethers, Signer } from 'ethers';
-import {Card} from 'react-bootstrap'
+import { BigNumber, ethers, Signer} from 'ethers';
+import { Card } from 'react-bootstrap'
 import { ContractAddress, ContractMethods } from './Constants';
-
-
-type PostManagerProps = {
-    id: BigNumber 
-    signer: Signer
-}
-function PostManager(props: PostManagerProps) {
-    const [id, updateMainID] = useState(props.id)
-    const [parents, updateParents] = useState<BigNumber[]>([])
-    const [replies, updateReplies] = useState<BigNumber[]>([])
-
-    useEffect(() =>  {
-        let contract = new ethers.Contract(
-            ContractAddress,
-            ContractMethods,
-            props.signer
-        )
-        const fetchData = async () => {
-        let curParents = await contract.getParents(id)
-        let curReplies = await contract.getBranches(id)
-        updateParents(curParents)
-        updateReplies(curReplies)
-    }
-        fetchData()
-    }, [id, props.signer])
-
-    return <>
-        <h1>Parents</h1>
-        {parents.map(p => <Post id={p} signer={props.signer} updateID={updateMainID}></Post>)}
-        <h1>Post</h1>
-        <Post id={id} signer={props.signer} updateID={updateMainID}></Post>
-        <h1>Replies</h1>
-        {replies.map(p => <Post id={p} signer={props.signer} updateID={updateMainID}></Post>)}
-    </>
-}
+import { Form } from 'react-bootstrap'
 
 type PostProps = {
     id: BigNumber 
@@ -48,6 +14,8 @@ type PostProps = {
 function Post(props: PostProps) {
     const [message, setMessage] = useState("")
     const [owner, setOwner] = useState("")
+    const [comment, setComment] = useState("")
+    const [sendingTx, setSendingTx] = useState(false)
 
     useEffect(() =>  {
         let contract = new ethers.Contract(
@@ -64,6 +32,35 @@ function Post(props: PostProps) {
         fetchData()
     }, [props.id, props.signer])
 
+    function makePrimary() {
+        props.updateID(props.id)
+    }
+
+    function handleSubmit(event: any) {
+        event.preventDefault();
+    }
+
+    async function makeComment() {
+        let contract = new ethers.Contract(
+            ContractAddress,
+            ContractMethods,
+            props.signer
+        )
+        const tx = await contract.comment(props.id, comment)
+        console.log(`Transaction hash: ${tx.hash}`);
+        setSendingTx(true)
+    
+        const receipt = await tx.wait();
+        console.log(`Transaction confirmed in block ${receipt.blockNumber}`);
+        let iface = new ethers.utils.Interface(ContractMethods);
+        let parsed = iface.parseLog(receipt.events[0]);
+        let tokenID = parsed.args._tokenId
+        console.log(`New Token ID: ${tokenID}`)
+        setComment("")
+        setSendingTx(false)
+        props.updateID(tokenID)
+    }
+
     let messageDisplayed = <Spinner animation="border" role="status"></Spinner>
     if(message !== "") {
         messageDisplayed = <>
@@ -72,20 +69,27 @@ function Post(props: PostProps) {
         </>
     }
 
-    function makePrimary() {
-        props.updateID(props.id)
+    let commentBox = (
+        <Form onSubmit={handleSubmit}>
+            <Form.Control as="textarea" rows={2} value={comment} onChange={(e) => setComment(e.target.value)}/>
+        </Form>
+    )
+    if(sendingTx) {
+        commentBox = <Spinner animation="border" role="status"></Spinner>
     }
+
 
     return (
         <Card>
         <Card.Body>
             <Card.Title>Post #{props.id.toString()}</Card.Title>
             {messageDisplayed}
-            <Button variant="primary">Comment</Button>
+            {commentBox}
+            <Button variant="primary" onClick={async () => {await makeComment()}}>Comment</Button>
             <Button variant="secondary" onClick={() => makePrimary()}>Make Primary</Button>
         </Card.Body>
         </Card>
     )
 }
 
-export {PostManager};
+export {Post};
