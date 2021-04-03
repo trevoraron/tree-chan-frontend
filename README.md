@@ -3,6 +3,8 @@
 Frontend for the Tree Chan platform. See the core contracts here:
 https://github.com/trevoraron/tree-chan-core
 
+See the latest deployed version of the site here: https://trevoraron.github.io/tree-chan-frontend/
+
 ## Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
@@ -33,6 +35,10 @@ The build is minified and the filenames include the hashes.\
 Your app is ready to be deployed!
 
 See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+
+### `yarn deploy`
+
+Will push the new version of the project to github pages
 
 ### `yarn eject`
 
