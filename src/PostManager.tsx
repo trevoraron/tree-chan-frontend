@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { BigNumber, ethers, Signer } from 'ethers';
-import { Col, Row, Form, Button, Collapse, Container } from 'react-bootstrap'
+import { Col, Row, Form, Button, Collapse } from 'react-bootstrap'
 import { ContractAddress, ContractMethods } from './Constants';
 import { NewMessage } from './NewMessage';
 import { Post } from './Post';
