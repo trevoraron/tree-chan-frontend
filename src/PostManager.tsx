@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { BigNumber, ethers, Signer } from 'ethers';
-import { Col, Row, Form} from 'react-bootstrap'
+import { Col, Row, Form, Button, Collapse } from 'react-bootstrap'
 import { ContractAddress, ContractMethods } from './Constants';
 import { NewMessage } from './NewMessage';
 import { Post } from './Post';
@@ -66,13 +66,45 @@ function PostManager(props: PostManagerProps) {
             </Col>
             </Form.Group>
         </Form>
-        <h3>Parents</h3>
-        {parents.map(p => <Post id={p} signer={props.signer} updateID={updateMainID}></Post>)}
+        <MakeCollapse posts={parents.map(p => <Post id={p} signer={props.signer} updateID={updateMainID}></Post>)} title="Parents"></MakeCollapse>
         <h3>Post</h3>
         <Post id={id} signer={props.signer} updateID={updateMainID}></Post>
-        <h3>Replies</h3>
-        {replies.map(p => <Post id={p} signer={props.signer} updateID={updateMainID}></Post>)}
+        <MakeCollapse posts={replies.map(p => <Post id={p} signer={props.signer} updateID={updateMainID}></Post>)} title="Replies"></MakeCollapse>
     </>
+}
+
+function MakeCollapse(props: {posts: JSX.Element[], title: string}) {
+    const [open, setOpen] = useState(true);
+
+    // Don't render anything if empty
+    if (props.posts.length === 0) {
+        return <></>
+    }
+ 
+    let buttonName = open ? "Collapse": "Expand"
+    return (
+      <>
+      <Row>
+        <Col>
+            <h3>{props.title}</h3>
+        </Col>
+        <Col>
+            <Button
+                onClick={() => setOpen(!open)}
+                aria-controls={props.title}
+                aria-expanded={open}
+            >
+                {buttonName}
+            </Button>
+        </Col>
+    </Row>
+    <Collapse in={open}>
+        <div>
+        {props.posts}
+        </div>
+    </Collapse>
+      </>
+    );
 }
 
 export { PostManager };
